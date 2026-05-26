@@ -3,34 +3,27 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 
-# 1. Inicializamos la aplicación FastAPI
+# 1. Inicialización de la aplicación FastAPI
 app = FastAPI(title="API de Imágenes S3")
 
 # 2. Configuramos el cliente de S3 usando boto3
-# Nota: boto3 usará automáticamente las credenciales que configuraste 
-# en tu terminal con 'aws configure'
 s3_client = boto3.client('s3', region_name='us-east-2')
 
-# Nombre de tu bucket (¡Cámbialo por el tuyo!)
 BUCKET_NAME = "final-sistop-punto2"
 
 # 3. Endpoint POST para subir la imagen
 @app.post("/upload/")
 async def upload_image(
-    # Recibimos el nombre del usuario como texto
     usuario: str = Form(...), 
-    # Recibimos el archivo de la imagen
     imagen: UploadFile = File(...)
 ):
     
-    # a. Validamos la extensión del archivo
     extensiones_permitidas = ["image/jpeg", "image/jpg", "image/png"]
     if imagen.content_type not in extensiones_permitidas:
         # Si no es JPG o PNG, devolvemos un error 415 (Unsupported Media Type)
         raise HTTPException(status_code=415, detail="Formato de archivo no permitido. Solo JPG y PNG.")
 
     # b. Construimos la ruta dentro de S3 (CarpetaUsuario/NombreImagen)
-    # Ejemplo: maria/mifoto.png
     ruta_s3 = f"{usuario}/{imagen.filename}"
 
     try:
@@ -84,3 +77,5 @@ async def get_image(usuario: str, nombre_imagen: str):
         else:
             # Si ocurre otro tipo de error de conexión, también lo reportamos
             raise HTTPException(status_code=500, detail="Error interno al conectar con AWS S3.")
+        
+##Profe, he de serte 100% sincera, no terminé de aprender bien Fastapi, como podrás evidenciar en el chat con Gemini, lo siento
